@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Seja bem-vindo a uma nova era de eventos - Stands, Cenografia e Contato">
+    <meta name="author" content="Live Events">
+    <title>Nova Era de Eventos</title>
+    <link rel="stylesheet" href="css/stands.css">
+</head>
+<body>
+  <div class="container">
+    <img src="image/fundo_page.png" alt="Fundo decorativo" class="background-image" loading="eager">
+
+    <nav class="navigation" role="navigation" aria-label="Menu principal">
+      <a href="index.html" class="nav-item" aria-label="Início">INÍCIO</a>
+      <span class="nav-separator" aria-hidden="true">|</span>
+      <a href="stands.html" class="nav-item" aria-label="Stands">STANDS</a>
+      <span class="nav-separator" aria-hidden="true">|</span>
+      <a href="cenografia.html" class="nav-item" aria-label="Cenografia">CENOGRAFIA</a>
+      <span class="nav-separator" aria-hidden="true">|</span>
+      <a href="contato.html" class="nav-item" aria-label="Contato">CONTATO</a>
+    </nav>
+
+    <img src="image/logo.png" alt="Logo Live Events" class="logo" loading="lazy">
+
+    <!-- Imagem Principal Grande Centralizada -->
+    <div class="main-image-container">
+      <div class="main-image-wrapper">
+        <img id="mainImage" src="" alt="Imagem em destaque" class="main-image">
+      </div>
+    </div>
+
+    <!-- Carrossel de Miniaturas -->
+    <div class="carousel-container">
+      <button class="carousel-btn prev" aria-label="Imagem anterior">‹</button>
+      
+      <div class="carousel-wrapper">
+        <div class="carousel-track" id="carouselTrack">
+        </div>
+      </div>
+
+      <button class="carousel-btn next" aria-label="Próxima imagem">›</button>
+    </div>
+  </div>
+
+  <script>
+    const carouselImages = [
+      'image/stands/001.jpg',
+      'image/stands/002.jpg',
+      'image/stands/003.jpg',
+      'image/stands/004.jpg',
+      'image/stands/005.jpg',
+      'image/stands/006.jpg',
+      'image/stands/007.jpg',
+      'image/stands/008.jpeg',
+      'image/stands/009.jpeg',
+      'image/stands/010.jpg',
+      'image/stands/011.png',
+      'image/stands/012.png'
+    ];
+
+    let currentIndex = 0;
+    const carouselTrack = document.getElementById('carouselTrack');
+    const mainImage = document.getElementById('mainImage');
+    const carouselWrapper = document.querySelector('.carousel-wrapper');
+
+    // Criar itens do carrossel (miniaturas)
+    function createCarouselItems() {
+      carouselTrack.innerHTML = '';
+
+      carouselImages.forEach((imageSrc, index) => {
+        const item = document.createElement('div');
+        item.className = `carousel-item ${index === currentIndex ? 'active' : ''}`;
+        item.setAttribute('data-index', index);
+        
+        const img = document.createElement('img');
+        img.src = imageSrc;
+        img.alt = `Miniatura ${index + 1}`;
+        img.loading = index <= 3 ? 'eager' : 'lazy';
+        
+        item.appendChild(img);
+        item.addEventListener('click', () => goToSlide(index));
+        carouselTrack.appendChild(item);
+      });
+
+      // Atualizar imagem principal
+      updateMainImage();
+      // Centralizar miniatura ativa no carrossel
+      scrollToActiveThumbnail();
+    }
+
+    // Atualizar imagem principal grande
+    function updateMainImage() {
+      mainImage.src = carouselImages[currentIndex];
+      mainImage.alt = `Imagem ${currentIndex + 1} em destaque`;
+    }
+
+    function updateCarousel() {
+      const items = carouselTrack.querySelectorAll('.carousel-item');
+
+      // Primeiro, remover todas as classes active
+      items.forEach((item) => {
+        item.classList.remove('active');
+      });
+
+      // Depois, adicionar a classe active no item correto
+      if (items[currentIndex]) {
+        items[currentIndex].classList.add('active');
+      }
+
+      // Atualizar imagem principal
+      updateMainImage();
+      
+      // Usar requestAnimationFrame para garantir que o DOM foi atualizado antes de calcular a posição
+      requestAnimationFrame(() => {
+        scrollToActiveThumbnail();
+      });
+    }
+
+    // Centralizar miniatura ativa no carrossel
+    function scrollToActiveThumbnail() {
+      const activeItem = carouselTrack.querySelector('.carousel-item.active');
+      if (activeItem) {
+        const containerWidth = carouselWrapper.offsetWidth;
+        const itemWidth = activeItem.offsetWidth;
+        const gap = 15; // gap entre itens
+        const scrollPosition = activeItem.offsetLeft - (containerWidth / 2) + (itemWidth / 2);
+        
+        // Garantir que a posição não seja negativa
+        const finalPosition = Math.max(0, scrollPosition);
+        
+        carouselTrack.style.transform = `translateX(-${finalPosition}px)`;
+      }
+    }
+
+    // Ir para slide específico
+    function goToSlide(index) {
+      if (index >= 0 && index < carouselImages.length) {
+        currentIndex = index;
+        updateCarousel();
+      }
+    }
+
+    // Próximo slide
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % carouselImages.length;
+      updateCarousel();
+    }
+
+    // Slide anterior
+    function prevSlide() {
+      currentIndex = (currentIndex - 1 + carouselImages.length) % carouselImages.length;
+      updateCarousel();
+    }
+
+    // Event listeners
+    document.querySelector('.carousel-btn.next').addEventListener('click', nextSlide);
+    document.querySelector('.carousel-btn.prev').addEventListener('click', prevSlide);
+
+    // Navegação por teclado
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight') nextSlide();
+    });
+
+    // Swipe para mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    carouselTrack.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    carouselTrack.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+      }
+    }
+
+    // Swipe na imagem principal também
+    mainImage.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    mainImage.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+      }
+    });
+
+    // Inicializar carrossel
+    createCarouselItems();
+
+    // Ajustar scroll ao redimensionar janela
+    window.addEventListener('resize', () => {
+      scrollToActiveThumbnail();
+    });
+  </script>
+</body>
+</html>
