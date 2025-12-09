@@ -109,8 +109,8 @@ body {
   transform: translate(-50%, -50%);
   background-color: rgba(0, 0, 0, 45%);
   backdrop-filter: blur(10px);
-  padding: 3.8rem 5.9rem;
-  max-width: 578px;
+  padding: 3.8rem 3.9rem;
+  max-width: 700px;
   width: 90%;
   color: #fff;
   z-index: 10;
@@ -224,7 +224,7 @@ body {
   }
 
   .contact-container {
-    padding: 3rem 4.5rem;
+    padding: 3rem 3.5rem;
     max-width: 520px;
   }
 
